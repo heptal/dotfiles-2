@@ -1,0 +1,13 @@
+
+- name: Make sure homebrew-cask is installed
+  homebrew: name=brew-cask state=present
+
+- name: Install Hammerspoon
+  homebrew_cask: name={{item}} state=present
+  with_items: hammerspoon
+
+- name: Link .hammerspoon dir
+  file:
+    src: "{{dotfiles_home}}/roles/hammerspoon/files/"
+    dest: "{{dotfiles_user_home}}/.hammerspoon"
+    state: link

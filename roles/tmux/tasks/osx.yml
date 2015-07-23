@@ -3,5 +3,5 @@
   homebrew: name={{item}} state=latest
   with_items:
     - tmux
-    # Needed for clipboard support
+    # Needed for clipboard support < 10.10
     - reattach-to-user-namespace

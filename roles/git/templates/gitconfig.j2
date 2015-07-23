@@ -18,6 +18,7 @@
         noff = merge --no-ff
         amend = commit --amend
         br = branch
+        d = diff
         df = diff
         dfs = diff --staged
         pl = pull
@@ -59,11 +60,24 @@
         status = auto
         branch = auto
         ui = true
+[color "branch"]
+        current = yellow reverse
+        local = yellow
+        remote = green
+[color "diff"]
+        meta = yellow bold
+        frag = magenta bold
+        old = red bold
+        new = green bold
+[color "status"]
+        added = yellow
+        changed = green
+        untracked = cyan
 [core]
         excludesfile = ~/.gitignore_global
         editor = vim
 [apply]
-        whitespace = nowarn
+        whitespace = warn
 [mergetool]
         keepBackup = false
 [difftool]

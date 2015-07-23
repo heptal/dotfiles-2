@@ -11,10 +11,10 @@
     - vim
     - python
     - npm
-    - hub
+    # - hub
     - autoenv
     - ag
     - tmux
     - git-flow
     - {role: osx, when: ansible_os_family == "Darwin"}
-
+    - {role: hammerspoon, when: ansible_os_family == "Darwin"}
