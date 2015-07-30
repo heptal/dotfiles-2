@@ -1,102 +1,122 @@
+-- adapted from various hammerspoon configs including cmsj, asmagill, trishume, etc.
+
 require "window"
 require "asciiart"
+
 
 
 -- disable animation
 hs.window.animationDuration = 0
 
--- define keys
+-- define mod keys
 hyper = {'ctrl', 'alt', 'cmd'}
 hypershift = {'ctrl', 'alt', 'cmd', 'shift'}
+cc = {'ctrl', 'cmd'}
+ccs = {'ctrl', 'cmd', 'shift'}
 
--- Define monitor names for layout purposes
+-- define monitor names for layout purposes
 local display_laptop = "Color LCD"
 local display_monitor = "ASUS VH242H"
 
 
 
--- Window Hints
-hs.hotkey.bind(hyper, '.', hs.hints.windowHints)
+-- Window grid configuration 
+local gw = 6 --GRIDWIDTH
+local gh = 4 --GRIDHEIGHT
+hs.grid.setMargins({0, 0})
+hs.grid.setGrid({gw, gh})
 
---hello world
-hs.hotkey.bind(hyper, "W", function()
-  hs.notify.new({title="Hammerspoon", informativeText="Hello World"}):send():release()
+local goleft = {x = 0, y = 0, w = gw/2, h = gh}
+local goright = {x = gw/2, y = 0, w = gw/2, h = gh}
+local gotop = {x = 0, y = 0, w = gw, h = gh/2}
+local gobottom = {x = 0, y = gh/2, w = gw, h = gh/2}
+
+local gotopleft = {x = 0, y = 0, w = gw/2, h = gh/2}
+local gotopright = {x = gw/2, y = 0, w = gw/2, h = gh/2}
+local gobottomleft = {x = 0, y = gh/2, w = gw/2, h = gh/2}
+local gobottomright = {x = gw/2, y = gh/2, w = gw/2, h = gh/2}
+
+-- move and resize windows to screen halves, hold for corners
+hs.hotkey.bind(hyper, "left",  gridset(goleft),   nil, gridset(gobottomleft)) 
+hs.hotkey.bind(hyper, "right", gridset(goright),  nil, gridset(gotopright)) 
+hs.hotkey.bind(hyper, "up",    gridset(gotop),    nil, gridset(gotopleft)) 
+hs.hotkey.bind(hyper, "down",  gridset(gobottom), nil, gridset(gobottomright)) 
+
+-- move and resize windows on grid
+hs.hotkey.bind(cc, "left",  function() hs.grid.pushWindowLeft(win()) end) 
+hs.hotkey.bind(cc, "right", function() hs.grid.pushWindowRight(win()) end) 
+hs.hotkey.bind(cc, "up",    function() hs.grid.pushWindowUp(win()) end) 
+hs.hotkey.bind(cc, "down",  function() hs.grid.pushWindowDown(win()) end) 
+
+hs.hotkey.bind(ccs, "left",  function() hs.grid.resizeWindowThinner(win()) end) 
+hs.hotkey.bind(ccs, "right", function() hs.grid.resizeWindowWider(win()) end) 
+hs.hotkey.bind(ccs, "up",    function() hs.grid.resizeWindowShorter(win()) end) 
+hs.hotkey.bind(ccs, "down",  function() hs.grid.resizeWindowTaller(win()) end) 
+
+-- move windows incrementally
+hs.hotkey.bind(hypershift, "left",  function() move(-20,0) end, nil, function() move(-20,0) end)
+hs.hotkey.bind(hypershift, "right", function() move(20, 0) end, nil, function() move(20, 0) end)
+hs.hotkey.bind(hypershift, "up",    function() move(0,-20) end, nil, function() move(0,-20) end)
+hs.hotkey.bind(hypershift, "down",  function() move(0, 20) end, nil, function() move(0, 20) end)
+
+
+hs.hotkey.bind(hyper, '.', hs.hints.windowHints)    -- show window hints
+hs.hotkey.bind(hyper, '/', hs.grid.show)            -- show grid
+hs.hotkey.bind(hyper, "Space", function() push(1/8, 1/8, 3/4, 3/4) end) -- center and enlarge current window
+hs.hotkey.bind(hypershift, "Space", hs.grid.maximizeWindow)             -- maximize current window
+
+
+
+-- bind application hotkeys
+hs.fnutils.each({
+  { key = "t", app = "iTerm" },
+  { key = "i", app = "iTunes" },
+  { key = "s", app = "Sublime Text" },
+  { key = "c", app = "Google Chrome" },
+  { key = "m", app = "Messages" }
+}, function(object)
+
+    local appActivation = function()
+        hs.application.launchOrFocus(object.app) 
+
+        local app = hs.appfinder.appFromName(object.app)
+        if app then
+            app:activate() 
+            app:unhide()
+        end
+    end
+
+    hs.hotkey.bind(hyper, object.key, appActivation)
 end)
-
-
-hs.hotkey.bind(hyper, "left",  function() push(0.0,0.0,0.5,1.0) end, nil, function() push(0.0,0.5,0.5,0.5) end) -- left side
-hs.hotkey.bind(hyper, "right", function() push(0.5,0.0,0.5,1.0) end, nil, function() push(0.5,0.0,0.5,0.5) end) -- right side
-hs.hotkey.bind(hyper, "up",    function() push(0.0,0.0,1.0,0.5) end, nil, function() push(0.0,0.0,0.5,0.5) end) -- top half
-hs.hotkey.bind(hyper, "down",  function() push(0.0,0.5,1.0,0.5) end, nil, function() push(0.5,0.5,0.5,0.5) end) -- bottom half
-
-
-hs.hotkey.bind(hyper, "h", function() move(-20,0) end, nil, function() move(-20,0) end)
-hs.hotkey.bind(hyper, "j", function() move(0, 20) end, nil, function() move(0, 20) end)
-hs.hotkey.bind(hyper, "k", function() move(0,-20) end, nil, function() move(0,-20) end)
-hs.hotkey.bind(hyper, "l", function() move(20, 0) end, nil, function() move(20, 0) end)
-
-
-
-
-hs.hotkey.bind(hyper, "Space", function() undo:pop() end)
-
 
 
 
 -- defeat paste blockers
 hs.hotkey.bind({"cmd", "alt"}, "V", function() hs.eventtap.keyStrokes(hs.pasteboard.getContents()) end)
 
+-- open hammerspoon console
+hs.hotkey.bind(hyper, "h", hs.openConsole)
 
-
-
-
-
-
-
-
-local mouseCircle = nil
-local mouseCircleTimer = nil
-
-function imagePreview(image2)
-    -- Delete an existing highlight if it exists
-    if mouseCircle then
-        mouseCircle:delete()
-        if mouseCircleTimer then
-            mouseCircleTimer:stop()
-        end
-    end
-    -- Get the current co-ordinates of the mouse pointer
-    mousepoint = hs.mouse.get()
-    -- Prepare a big red circle around the mouse pointer
-    image = hs.image.imageFromASCII(chevron)
-    mouseCircle = hs.drawing.image(hs.geometry.rect(mousepoint.x-40, mousepoint.y-40, 80, 80), image)
-    -- mouseCircle:setStrokeColor({["red"]=1,["blue"]=0,["green"]=0,["alpha"]=1})
-    -- mouseCircle:setFill(false)
-    -- mouseCircle:setStrokeWidth(5)
-    mouseCircle:show()
+-- for playing with ASCIImage
+function imagePreview(image)
+    local mousepoint = hs.mouse.get()
+    local imageRect = hs.drawing.image(hs.geometry.rect(mousepoint.x+20, mousepoint.y, 100, 100), image)
+    imageRect:show()
 
     -- Set a timer to delete the circle after 3 seconds
-    mouseCircleTimer = hs.timer.doAfter(3, function() mouseCircle:delete() end)
+    imageRectTimer = hs.timer.doAfter(3, function() imageRect:delete() end)
 end
-hs.hotkey.bind(hyper, "D", function() imagePreview(VPNIcon) end)
 
 
 
-
-
-
-
-
-
-
-
-
+-- caffeine replacement
 local caffeine = hs.menubar.new()
+
 function setCaffeineDisplay(state)
     if state then
-        caffeine:setIcon(ampicon)
+        caffeine:setIcon(ampOnIcon)
     else
-        caffeine:setIcon(noampicon)
+        caffeine:setIcon(ampOffIcon)
     end
 end
 
@@ -108,6 +128,8 @@ if caffeine then
     caffeine:setClickCallback(caffeineClicked)
     setCaffeineDisplay(hs.caffeinate.get("displayIdle"))
 end
+
+
 
 -- auto reload config
 function reloadConfig(files)

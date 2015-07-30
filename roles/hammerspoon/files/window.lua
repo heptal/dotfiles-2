@@ -1,5 +1,22 @@
 -- Window Management
 
+-- shorthand for focused window for playing around
+fw = function ()
+    return hs.window.focusedWindow()
+end
+
+-- move and resize windows using grid
+gridset = function(frame)
+    return function()
+        local win = hs.window.focusedWindow()
+        if win then
+            hs.grid.set(win, frame, win:screen())
+        else
+            hs.alert.show("No focused window.")
+        end
+    end
+end
+
 -- Resize window for chunk of screen.
 -- For x and y: use 0 to expand fully in that dimension, 0.5 to expand halfway
 -- For w and h: use 1 for full, 0.5 for half
@@ -18,10 +35,7 @@ function push(x, y, w, h)
   win:setFrame(f)
 end
 
-
-
-
-
+-- move windows incrementally
 function move(x, y)
   local win = hs.window.focusedWindow()
   local f = win:frame()
