@@ -43,15 +43,15 @@ hs.hotkey.bind(hyper, "up",    gridset(gotop),    nil, gridset(gotopleft))
 hs.hotkey.bind(hyper, "down",  gridset(gobottom), nil, gridset(gobottomright)) 
 
 -- move and resize windows on grid
-hs.hotkey.bind(cc, "left",  function() hs.grid.pushWindowLeft(win()) end) 
-hs.hotkey.bind(cc, "right", function() hs.grid.pushWindowRight(win()) end) 
-hs.hotkey.bind(cc, "up",    function() hs.grid.pushWindowUp(win()) end) 
-hs.hotkey.bind(cc, "down",  function() hs.grid.pushWindowDown(win()) end) 
+hs.hotkey.bind(cc, "left",  function() hs.grid.pushWindowLeft(fw()) end) 
+hs.hotkey.bind(cc, "right", function() hs.grid.pushWindowRight(fw()) end) 
+hs.hotkey.bind(cc, "up",    function() hs.grid.pushWindowUp(fw()) end) 
+hs.hotkey.bind(cc, "down",  function() hs.grid.pushWindowDown(fw()) end) 
 
-hs.hotkey.bind(ccs, "left",  function() hs.grid.resizeWindowThinner(win()) end) 
-hs.hotkey.bind(ccs, "right", function() hs.grid.resizeWindowWider(win()) end) 
-hs.hotkey.bind(ccs, "up",    function() hs.grid.resizeWindowShorter(win()) end) 
-hs.hotkey.bind(ccs, "down",  function() hs.grid.resizeWindowTaller(win()) end) 
+hs.hotkey.bind(ccs, "left",  function() hs.grid.resizeWindowThinner(fw()) end) 
+hs.hotkey.bind(ccs, "right", function() hs.grid.resizeWindowWider(fw()) end) 
+hs.hotkey.bind(ccs, "up",    function() hs.grid.resizeWindowShorter(fw()) end) 
+hs.hotkey.bind(ccs, "down",  function() hs.grid.resizeWindowTaller(fw()) end) 
 
 -- move windows incrementally
 hs.hotkey.bind(hypershift, "left",  function() move(-20,0) end, nil, function() move(-20,0) end)
