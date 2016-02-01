@@ -2,19 +2,19 @@
 
 -- shorthand for focused window for playing around
 fw = function ()
-    return hs.window.focusedWindow()
+  return hs.window.focusedWindow()
 end
 
 -- move and resize windows using grid
 gridset = function(frame)
-    return function()
-        local win = hs.window.focusedWindow()
-        if win then
-            hs.grid.set(win, frame, win:screen())
-        else
-            hs.alert.show("No focused window.")
-        end
+  return function()
+    local win = hs.window.focusedWindow()
+    if win then
+      hs.grid.set(win, frame, win:screen())
+    else
+      hs.alert.show("No focused window.")
     end
+  end
 end
 
 -- Resize window for chunk of screen.
@@ -44,7 +44,6 @@ function move(x, y)
   f.y = f.y + y
   win:setFrame(f)
 end
-
 
 --undo for toggling windows
 undo = {}
