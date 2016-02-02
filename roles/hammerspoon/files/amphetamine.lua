@@ -1,6 +1,7 @@
 -- caffeine replacement
 
 local icon = require "asciicons"
+
 caffeine = hs.menubar.new()
 
 local function setCaffeineDisplay(state)

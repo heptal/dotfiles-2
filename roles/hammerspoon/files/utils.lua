@@ -1,7 +1,9 @@
 -- Return the sorted keys of a table
-function tableKeys(tab)
+function tableKeys(t)
   local keys={}
-  for k,v in pairs(tab) do table.insert(keys,k) end
+  for k, v in pairs(t) do
+    table.insert(keys, k)
+  end
   table.sort(keys)
   return keys
 end
@@ -27,6 +29,6 @@ end
 
 function tableContains(t, key)
   for i, v in ipairs(t) do
-    if v==key then return i end
+    if v == key then return i end
   end
 end

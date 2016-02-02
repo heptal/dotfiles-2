@@ -1,64 +1,108 @@
--- Window Management
+-- window management
 
--- shorthand for focused window for playing around
-fw = function ()
+-- shorthand for focused window
+function fw()
   return hs.window.focusedWindow()
 end
 
--- move and resize windows using grid
-gridset = function(frame)
+-- move and/or resize windows
+function rect(rect)
   return function()
-    local win = hs.window.focusedWindow()
-    if win then
-      hs.grid.set(win, frame, win:screen())
-    else
-      hs.alert.show("No focused window.")
-    end
+    undo:push()
+    local win = fw()
+    if win then win:move(rect) end
   end
 end
 
--- Resize window for chunk of screen.
--- For x and y: use 0 to expand fully in that dimension, 0.5 to expand halfway
--- For w and h: use 1 for full, 0.5 for half
-function push(x, y, w, h)
-  local win = hs.window.focusedWindow()
-  local f = win:frame()
-  local screen = win:screen()
-  local max = screen:frame()
+-- window grid configuration
+local gridWidth, gridHeight = 6, 4
+hs.grid.setGrid(gridWidth.."x"..gridHeight)
+hs.grid.setMargins({0, 0})
 
-  undo:push()
+-- show 3x3 grid modal
+hs.hotkey.bind(hyper, '/', function()
+    local gridSize = hs.grid.getGrid()
+    hs.grid.setGrid("3x3")
+    hs.grid.show(function() hs.grid.setGrid(gridSize) end)
+  end)
 
-  f.x = max.x + (max.w*x)
-  f.y = max.y + (max.h*y)
-  f.w = max.w*w
-  f.h = max.h*h
-  win:setFrame(f)
+-- center and enlarge current window
+hs.hotkey.bind(
+  hyper,
+  "space",
+  rect({1/8, 1/8, 3/4, 3/4}),
+  nil,
+  rect({0, 0, 1, 1})
+)
+
+-- define window movement/resize operation mappings
+local dirs = {
+  Up    = { half={ 0, 0, 1,.5}, movement={ 0,-20}, complement="Left",  resize="Shorter" },
+  Down  = { half={ 0,.5, 1,.5}, movement={ 0, 20}, complement="Right", resize="Taller"  },
+  Left  = { half={ 0, 0,.5, 1}, movement={-20, 0}, complement="Down",  resize="Thinner" },
+  Right = { half={.5, 0,.5, 1}, movement={ 20, 0}, complement="Up",    resize="Wider"   },
+}
+
+-- compose screen quadrants from halves
+local function quadrant(t1, t2)
+  return {t1[1] + t2[1], t1[2] + t2[2], .5, .5}
 end
 
--- move windows incrementally
-function move(x, y)
-  local win = hs.window.focusedWindow()
-  local f = win:frame()
+-- arrow-based window movement/resize operations
+hs.fnutils.each({"Left", "Right", "Up", "Down"}, function(dir)
 
-  f.x = f.x + x
-  f.y = f.y + y
-  win:setFrame(f)
-end
+    hs.hotkey.bind( -- move to screen halves; hold for quadrants
+      hyper,
+      dir,
+      rect(dirs[dir].half),
+      nil,
+      rect(quadrant(dirs[dir].half, dirs[dirs[dir].complement].half))
+    )
 
---undo for toggling windows
+    hs.hotkey.bind( -- move windows incrementally
+      {"ctrl", "cmd"},
+      dir,
+      rect(dirs[dir].movement),
+      nil,
+      rect(dirs[dir].movement)
+    )
+
+    hs.hotkey.bind( -- move windows by grid increments
+      {"ctrl", "alt"},
+      dir,
+      function()
+        undo:push()
+        hs.grid['pushWindow'..dir](fw())
+      end
+    )
+
+    hs.hotkey.bind( -- resize windows by grid increments
+      {"ctrl", "alt", "shift"},
+      dir,
+      function()
+        undo:push()
+        hs.grid['resizeWindow'..dirs[dir].resize](fw())
+      end
+    )
+
+  end)
+
+-- undo for window operations
 undo = {}
 
 function undo:push()
-  local win = hs.window.focusedWindow()
+  local win = fw()
   if not undo[win:id()] then
     self[win:id()] = win:frame()
   end
 end
 
 function undo:pop()
-  local win = hs.window.focusedWindow()
+  local win = fw()
   if self[win:id()] then
     win:setFrame(self[win:id()])
     self[win:id()] = nil
   end
 end
+
+hs.hotkey.bind({"ctrl", "alt"}, "z", function() undo:pop() end)
