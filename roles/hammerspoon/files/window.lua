@@ -86,14 +86,14 @@ undo = {}
 
 function undo:push()
   local win = fw()
-  if not undo[win:id()] then
+  if win and not undo[win:id()] then
     self[win:id()] = win:frame()
   end
 end
 
 function undo:pop()
   local win = fw()
-  if self[win:id()] then
+  if win and self[win:id()] then
     win:setFrame(self[win:id()])
     self[win:id()] = nil
   end

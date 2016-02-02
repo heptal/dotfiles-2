@@ -16,6 +16,7 @@ require "redshift"
 hsi = hs.inspect -- shortcut for inspecting tables
 hs.hotkey.bind(hyper, "h", hs.toggleConsole) -- toggle hammerspoon console
 hs.hotkey.bind(hyper, '.', hs.hints.windowHints) -- show window hints
+hs.ipc.cliInstall()
 
 -- for playing with ASCIImage, etc
 function imagePreview(image)
