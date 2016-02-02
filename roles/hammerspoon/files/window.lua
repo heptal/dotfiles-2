@@ -6,7 +6,7 @@ function fw()
 end
 
 -- move and/or resize windows
-function rect(rect)
+local function rect(rect)
   return function()
     undo:push()
     local win = fw()
@@ -26,14 +26,8 @@ hs.hotkey.bind(hyper, '/', function()
     hs.grid.show(function() hs.grid.setGrid(gridSize) end)
   end)
 
--- center and enlarge current window
-hs.hotkey.bind(
-  hyper,
-  "space",
-  rect({1/8, 1/8, 3/4, 3/4}),
-  nil,
-  rect({0, 0, 1, 1})
-)
+-- center and enlarge current window; hold to maximize
+hs.hotkey.bind(hyper, "space", rect({1/8, 1/8, 3/4, 3/4}), nil, rect({0, 0, 1, 1}))
 
 -- define window movement/resize operation mappings
 local dirs = {
