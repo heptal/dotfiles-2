@@ -7,7 +7,7 @@ osx_homebrew_packages:
 
 # Mac Apps to be installed with homebrew-cask
 osx_cask_packages:
-  - firefox
-  - google-chrome
-  - bettertouchtool
-  - iterm2
+  # - firefox
+  # - google-chrome
+  # - bettertouchtool
+  # - iterm2

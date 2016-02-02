@@ -24,3 +24,6 @@
 - name: Copy minimal zshrc
   copy: src=zshrc_minimal dest={{dotfiles_user_home}}/.zshrc
   when: not zsh_prezto
+
+- name: Creates user bin directory
+  file: path={{dotfiles_user_home}}/bin state=directory

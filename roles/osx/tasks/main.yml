@@ -15,3 +15,13 @@
 - name: Install Mac apps with homebrew cask
   homebrew_cask: name={{item}} state=present
   with_items: osx_cask_packages
+
+
+- name: Make sure user bin directory exists
+  file: path={{dotfiles_user_home}}/bin state=directory
+
+- name: Link Sublime
+  file:
+    src: "/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl"
+    dest: "{{dotfiles_user_home}}/bin/subl"
+    state: link
