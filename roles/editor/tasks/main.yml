@@ -1,0 +1,19 @@
+# configs
+- name: link .jsbeautifyrc
+  file:
+    src: "{{dotfiles_home}}/roles/editor/files/jsbeautifyrc.link"
+    dest: "{{dotfiles_user_home}}/.jsbeautifyrc"
+    state: link
+
+- name: link .editorconfig
+  file:
+    src: "{{dotfiles_home}}/roles/editor/files/editorconfig.link"
+    dest: "{{dotfiles_user_home}}/.editorconfig"
+    state: link
+
+- name: link VS Code
+  file:
+    src: "{{dotfiles_home}}/roles/editor/files/code.link"
+    dest: "{{dotfiles_user_home}}/bin/code"
+    state: link
+    mode: 0755
