@@ -4,16 +4,21 @@
 hyper = {'⌘', '⌥', '⌃'}
 hs.window.animationDuration = 0
 hs.hotkey.setLogLevel("warning") --suppress excessive keybind printing in console
+hs.window.filter.setLogLevel("error") --suppress excessive keybind printing in console
 
 require "utils"
+icons = require "asciicons"
 require "window"
 require "amphetamine"
 require "imgur"
 require "pasteboard"
-require "redshift"
+mpd = require "mpd"
+-- require "socket"
+-- require "redshift"
 -- spaces = require("hs._asm.undocumented.spaces")
 
 hsi = hs.inspect -- shortcut for inspecting tables
+clear = hs.console.clearConsole
 hs.hotkey.bind(hyper, "h", hs.toggleConsole) -- toggle hammerspoon console
 hs.hotkey.bind(hyper, '.', hs.hints.windowHints) -- show window hints
 hs.ipc.cliInstall()
@@ -24,6 +29,8 @@ function imagePreview(image)
   local imageRect = hs.drawing.image(hs.geometry(pos, {w = 100, h = 100}), image):show()
   imageRectTimer = hs.timer.doAfter(3, function() imageRect:delete() end)
 end
+
+ip = imagePreview
 
 -- bind application hotkeys
 hs.fnutils.each({
