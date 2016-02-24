@@ -31,10 +31,10 @@ hs.hotkey.bind(hyper, "space", rect({1/8, 1/8, 3/4, 3/4}), nil, rect({0, 0, 1, 1
 
 -- define window movement/resize operation mappings
 local dirs = {
-  Up    = { half={ 0, 0, 1,.5}, movement={ 0,-20}, complement="Left",  resize="Shorter" },
-  Down  = { half={ 0,.5, 1,.5}, movement={ 0, 20}, complement="Right", resize="Taller"  },
-  Left  = { half={ 0, 0,.5, 1}, movement={-20, 0}, complement="Down",  resize="Thinner" },
-  Right = { half={.5, 0,.5, 1}, movement={ 20, 0}, complement="Up",    resize="Wider"   },
+  Up    = { half = { 0, 0, 1,.5}, movement = { 0,-20}, complement = "Left",  resize = "Shorter" },
+  Down  = { half = { 0,.5, 1,.5}, movement = { 0, 20}, complement = "Right", resize = "Taller"  },
+  Left  = { half = { 0, 0,.5, 1}, movement = {-20, 0}, complement = "Down",  resize = "Thinner" },
+  Right = { half = {.5, 0,.5, 1}, movement = { 20, 0}, complement = "Up",    resize = "Wider"   },
 }
 
 -- compose screen quadrants from halves

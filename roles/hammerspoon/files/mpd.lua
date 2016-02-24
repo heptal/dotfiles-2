@@ -1,23 +1,23 @@
 local mpd = {}
 
+mpd.logger = hs.logger.new("mpd")
+mpd.setLogLevel = mpd.logger.setLogLevel
+local logger = mpd.logger
+
 local fmt = string.format
 local icon = require "asciicons"
 
 local queue = function(t, i) table.insert(t, i) end
 local dequeue = function(t) return table.remove(t, 1) end
 
-local logger = hs.logger.new("mpd")
-logger.setLogLevel("info")
-
 local FIRSTLINE = 0
--- local OK = -1
 local DEBUG = -2
 
 local function mpdMenuDisplay()
   mpdMenuPlayPause:setIcon(mpd.status.state == "play" and icons.pause or icons.play)
 
-  local tooltip = (mpd.track.current.Artist and mpd.track.current.Artist.." - " or "")..(mpd.track.current.Title or "-")
-  mpdMenuPlayPause:setTooltip(tooltip)
+  local currentTooltip = (mpd.track.current.Artist and mpd.track.current.Artist.." - " or "")..(mpd.track.current.Title or "-")
+  mpdMenuPlayPause:setTooltip(currentTooltip)
   mpdMenuNext:setTooltip(mpd.track.next and mpd.track.next.Title or "")
 
   if mpd.status.state == "play" and not mpd.track.current.Title then
@@ -60,7 +60,6 @@ tableMerge(mpd, {
     logger.i("reading with tag", tag)
     mpd.buffer = {}
     queue(mpd.currentTags, tag)
-    -- if tag ~= mpd.tag("CONNECT") then tag = FIRSTLINE end
     mpd.socket:read("\n", FIRSTLINE)
   end,
 
@@ -74,15 +73,16 @@ tableMerge(mpd, {
       mpd.mpdError = data
       hs.alert("MPD Error:\n\n"..data)
       local tag = dequeue(mpd.currentTags)
-      print("tag failed: ", mpd.tags[tag])
+      logger.e("tag failed: ", mpd.tags[tag])
       return true
     end
     return false
   end,
 
   readCallback = function(data, tag)
-    print("tag", tag)
-    print("queued tags: ", hs.inspect(hs.fnutils.mapCat(mpd.currentTags, function(t) return {mpd.tags[t]} end)))
+    logger.i("tag", tag, mpd.tags[tag])
+    logger.i("queued tags: ", hs.inspect(hs.fnutils.mapCat(mpd.currentTags, function(t) return {mpd.tags[t]} end)))
+
     if mpd.checkError(data) then return end
     if tag == DEBUG then print("DEBUG:\n", data); return end
 
@@ -94,12 +94,17 @@ tableMerge(mpd, {
         mpd.tagReaders[mpd.tags[t]].fn(data)
       else
         mpd.firstLine = data
-        mpd.socket:read("\n"..mpd.delimiter, t)
+        mpd.socket:read(mpd.delimiter, t)
       end
       return
     end
 
     data = mpd.firstLine..data
+    if not data:find("\nOK\n$") then
+      mpd.firstLine = data
+      mpd.socket:read(mpd.delimiter, tag)
+    end
+
     local t = mpd.tags[tag]
     local tagReader = mpd.tagReaders[t]
 
@@ -147,21 +152,20 @@ mpd.tagReaders = {
   CONNECT = { form = "line", fn = function(data) logger.i("CONNECTED: "..data) end },
   OK = { form = "line", fn = function(data) logger.i(data) end },
   PLAYID = { form = "table", fn = function(data)
-    print(data)
+    logger.i("playing id: ", data)
     mpd.playid(data.Id)
-    end
+    end 
   },
   STATUS = { form = "table", fn = function(data)
     mpd.status = data
     mpd.currentsong()
     mpd.nextsong()
-    -- mpdMenuDisplay()
     end
   },
   CURRENTSONG = { form = "table", fn = function(data)
-    -- if type(mpd.track.current) == "table" and not tableCompare(data, mpd.track.current) then
-    --   hs.notify.show(data.Title or "", "", data.Artist and data.Artist or data.Name and data.Name or "", "")
-    -- end
+    if type(mpd.track.current) == "table" and type(data) == "table" and not tableCompare(data, mpd.track.current) then
+      hs.notify.show(data.Title or "", "", data.Artist and data.Artist or data.Name and data.Name or "", "")
+    end
     mpd.track.current = data
     end
   },
@@ -258,10 +262,6 @@ end
 
 mpd.updateStatus = function()
   mpd.getstatus()
-  -- mpd.currentsong()
-  -- mpd.nextsong()
-  -- hs.timer.doAfter(0.1, mpd.currentsong)
-  -- hs.timer.doAfter(0.1, mpd.nextsong)
   hs.timer.doAfter(0.2, mpdMenuDisplay)
 end
 
@@ -293,7 +293,6 @@ function makeChoicesFromAlbums(albums)
 end
 
 local function playChoice(choice)
-  print(hsi(choice))
   if choice.Id then 
     mpd.playid(choice.Id) 
   elseif choice.file then
@@ -316,7 +315,7 @@ hs.hotkey.bind(hyper, "p", function() searchChooser:show() end)
 albumChooser=hs.chooser.new(function(choice) mpd.findadd(choice.album, "album") end):width(30):searchSubText(true)
 hs.hotkey.bind(hyper, "a", function() albumChooser:show() end)
 
-
+-- menubars
 mpdMenuNext = hs.menubar.new():setIcon(icons.next):setClickCallback(function()
     mpd.next()
     mpd.updateStatus()
@@ -363,11 +362,9 @@ mpdMenu = hs.menubar.new():setTitle("🎵"):setMenu({
   { title = "u80s", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/u80s-128-mp3") end },
 })
 
-mpd.updateStatus()
+hs.timer.doAfter(1, mpd.updateStatus)
 hs.timer.doAfter(2, mpd.listalbumartist)
 
--- statusTimer = hs.timer.doEvery(5, mpd.updateStatus)
--- mpdTimer = hs.timer.doEvery(60, mpd.ping)
-
+statusTimer = hs.timer.doEvery(10, mpd.updateStatus)
 
 return mpd
