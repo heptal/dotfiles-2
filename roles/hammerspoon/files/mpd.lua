@@ -118,6 +118,7 @@ tableMerge(mpd, {
     if not data:find("\nOK\n$") then
       mpd.firstLine = data
       mpd.socket:read(mpd.delimiter, tag)
+      return
     end
 
     local t = mpd.tags[tag]
@@ -130,6 +131,7 @@ tableMerge(mpd, {
     mpd.buffer = buffer
     local parsed = mpd.parseBuffer(tagReader.form, mpd.buffer)
     mpd.parsed = parsed
+    logger.i("Calling callback for tag: ", tag, mpd.tags[tag])
     tagReader.fn(parsed)
   end,
 
@@ -219,7 +221,7 @@ end)
 mpd.currentsong = function() mpd.sendrecv("currentsong", tag("CURRENTSONG")) end
 mpd.getstatus = function() mpd.sendrecv("status", tag("STATUS")) end
 mpd.playlistinfo = function(starting, ending) mpd.sendrecv("playlistinfo", tag("PLAYLISTINFO")) end
-mpd.listalbumartist = function() mpd.sendrecv("list album group artist", tag("LISTALBUMARTIST")) end
+mpd.listalbumartist = function() mpd.sendrecv("list album group albumartist group artist", tag("LISTALBUMARTIST")) end
 mpd.addid = function(file) mpd.sendrecv(fmt("addid %q", file)) end
 mpd.addplayid = function(file) mpd.sendrecv(fmt("addid %q", file), tag("PLAYID")) end
 
@@ -268,7 +270,7 @@ function makeChoicesFromTracks(tracks)
     return {
       text = track.Title or track.Name,
       subText = (track.Artist or "")..(track.Album and " - "..track.Album or "")..(track.Name or ""),
-      image = track.file and hs.image.imageForMediaFile("~/Music/"..track.file) or hs.image.iconForFile("~/Music/"..track.file) or nil,
+      image = track.file and hs.image.imageFromAudioFile("~/Music/"..track.file) or hs.image.iconForFile("~/Music/"..track.file) or nil,
       file = (track.file and track.file or ""),
       Id = track.Id or nil
     }
@@ -280,6 +282,7 @@ function makeChoicesFromAlbums(albums)
     return {
       text = album.Album,
       subText = album.Artist,
+      image = hs.image.imageFromAudioFile("~/Music/"..album.AlbumArtist:gsub("Various Artists", "Compilations"):gsub("[/]", "_"):gsub("[?%.]$","_").."/"..album.Album:gsub("[:/\"]", "_"):gsub("[?%.]$","_")),
       album = album.Album,
     }
   end)
