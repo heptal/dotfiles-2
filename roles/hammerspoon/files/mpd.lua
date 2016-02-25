@@ -1,3 +1,5 @@
+DEBUGMPD = false
+
 local mpd = {}
 
 mpd.logger = hs.logger.new("mpd")
@@ -15,12 +17,14 @@ local DEBUG = -2
 
 local function mpdMenuDisplay()
   mpdMenuPlayPause:setIcon(mpd.status.state == "play" and icons.pause or icons.play)
+  local c = mpd.track.current
+  local n = mpd.track.next
 
-  local currentTooltip = (mpd.track.current.Artist and mpd.track.current.Artist.." - " or "")..(mpd.track.current.Title or "-")
+  local currentTooltip = (c.Artist and c.Artist.." - " or "")..(c.Title or "-")
   mpdMenuPlayPause:setTooltip(currentTooltip)
-  mpdMenuNext:setTooltip(mpd.track.next and mpd.track.next.Title or "")
+  mpdMenuNext:setTooltip(n and ((n.Artist and n.Title) and (n.Artist.." - "..n.Title) or n.Name and n.Name) or "END")
 
-  if mpd.status.state == "play" and not mpd.track.current.Title then
+  if mpd.status.state == "play" and not c.Title then
     hs.timer.doAfter(0.2, mpd.updateStatus)
   end
 end
@@ -28,6 +32,7 @@ end
 tableMerge(mpd, {
   host ="localhost",
   port = 6600,
+  version = nil,
   delimiter = "OK\n",
   currentTags = {},
   mpdError = nil,
@@ -36,9 +41,18 @@ tableMerge(mpd, {
   status = {},
   track = {},
   albums = {},
+  playlist = {},
   socket = hs.socket.new(),
 
-  connect = function() 
+  started = function()
+    local output, status = hs.execute("ps -Ac -o pid,comm|grep mpd")
+    return status and output:find("mpd") and true or false
+  end,
+
+  start = function() hs.execute("mpd", true) end,
+
+  connect = function()
+    if not mpd.started() then mpd.start() end
     logger.i("connecting...")
     mpd.socket:setCallback(mpd.readCallback):connect(mpd.host, mpd.port)
     mpd.read(mpd.tag("CONNECT"))
@@ -82,6 +96,7 @@ tableMerge(mpd, {
   readCallback = function(data, tag)
     logger.i("tag", tag, mpd.tags[tag])
     logger.i("queued tags: ", hs.inspect(hs.fnutils.mapCat(mpd.currentTags, function(t) return {mpd.tags[t]} end)))
+    if DEBUGMPD then print(data) end
 
     if mpd.checkError(data) then return end
     if tag == DEBUG then print("DEBUG:\n", data); return end
@@ -149,11 +164,11 @@ tableMerge(mpd, {
 })
 
 mpd.tagReaders = {
-  CONNECT = { form = "line", fn = function(data) logger.i("CONNECTED: "..data) end },
+  CONNECT = { form = "line", fn = function(data) logger.i("CONNECTED: "..data); mpd.version = data end },
   OK = { form = "line", fn = function(data) logger.i(data) end },
   PLAYID = { form = "table", fn = function(data)
     logger.i("playing id: ", data)
-    mpd.playid(data.Id)
+    if data.Id then mpd.playid(data.Id) end
     end 
   },
   STATUS = { form = "table", fn = function(data)
@@ -182,11 +197,13 @@ mpd.tagReaders = {
     end
   },
   PLAYLISTINFO = { form = "table-list", fn = function(data)
-    searchChooser:choices(makeChoicesFromTracks(data))
+    mpd.playlist = data
+    playlistChooser:choices(makeChoicesFromTracks(mpd.playlist))
     end
   },
   LISTALBUMARTIST = { form = "table-list", fn = function(data)
-    albumChooser:choices(makeChoicesFromAlbums(data))
+    mpd.albums = data
+    albumChooser:choices(makeChoicesFromAlbums(mpd.albums))
     end
   },
 }
@@ -195,33 +212,16 @@ mpd.tags = tableKeys(mpd.tagReaders)
 mpd.tag = function(tag) return hs.fnutils.indexOf(mpd.tags, tag) end
 local tag = mpd.tag
 
-hs.fnutils.each({
-  "play",
-  "pause",
-  "next",
-  "previous",
-  "stop",
-  "clear",
-  "shuffle",
-  "ping",
- }, function(item)
+hs.fnutils.each({ "play", "pause", "next", "previous", "stop", "clear", "shuffle", "ping" }, function(item)
   mpd[item] = function() mpd.sendrecv(item) end
 end)
 
-mpd.command = function(cmd, tag) mpd.sendrecv(cmd, tag) end
-mpd.debug = function(cmd) mpd.send(cmd); mpd.socket:read("\n", DEBUG) end
-
-mpd.currentsong = function()
-  mpd.sendrecv("currentsong", tag("CURRENTSONG"))
-end
-
-mpd.getstatus = function()
-  mpd.sendrecv("status", tag("STATUS"))
-end
-
-mpd.playlistinfo = function(starting, ending)
-  mpd.sendrecv("playlistinfo", tag("PLAYLISTINFO"))
-end
+mpd.currentsong = function() mpd.sendrecv("currentsong", tag("CURRENTSONG")) end
+mpd.getstatus = function() mpd.sendrecv("status", tag("STATUS")) end
+mpd.playlistinfo = function(starting, ending) mpd.sendrecv("playlistinfo", tag("PLAYLISTINFO")) end
+mpd.listalbumartist = function() mpd.sendrecv("list album group artist", tag("LISTALBUMARTIST")) end
+mpd.addid = function(file) mpd.sendrecv(fmt("addid %q", file)) end
+mpd.addplayid = function(file) mpd.sendrecv(fmt("addid %q", file), tag("PLAYID")) end
 
 mpd.search = function(str, kind)
   kind = kind or "any"
@@ -238,20 +238,14 @@ mpd.findadd = function(str, kind)
   mpd.sendrecv(fmt("findadd %q %q", kind, str))
 end
 
-mpd.listalbumartist = function()
-  mpd.sendrecv("list album group artist", tag("LISTALBUMARTIST"))
-end
-
-mpd.addid = function(file)
-  mpd.sendrecv(fmt("addid %q", file))
-end
-
-mpd.addplayid = function(file)
-  mpd.sendrecv(fmt("addid %q", file), tag("PLAYID"))
+mpd.playitemonplaylist = function(item, kind)
+  kind = kind or "any"
+  mpd.sendrecv(fmt("playlistsearch %q %q", kind, item), tag("PLAYID"))
 end
 
 mpd.nextsong = function()
-  if not mpd.status.nextsong then mpd.track.next = nil; return end
+  mpd.track.next = nil
+  if not mpd.status.nextsong then return end
   mpd.sendrecv("playlistinfo "..mpd.status.nextsong, tag("NEXTSONG"))
 end
 
@@ -265,13 +259,16 @@ mpd.updateStatus = function()
   hs.timer.doAfter(0.2, mpdMenuDisplay)
 end
 
+mpd.command = function(cmd, tag) mpd.sendrecv(cmd, tag) end
+mpd.debug = function(cmd) mpd.send(cmd); mpd.socket:read("\n", DEBUG) end
 
 function makeChoicesFromTracks(tracks)
   return hs.fnutils.imap(tracks, function(track) 
+    if track.file == nil then return nil end
     return {
       text = track.Title or track.Name,
-      subText = (track.Artist and track.Artist or "")..(track.Album and " - "..track.Album or ""),
-      image = track.file and hs.image.iconForFile((track.file and "~/Music/"..track.file) or "") or nil,
+      subText = (track.Artist or "")..(track.Album and " - "..track.Album or "")..(track.Name or ""),
+      image = track.file and hs.image.imageForMediaFile("~/Music/"..track.file) or hs.image.iconForFile("~/Music/"..track.file) or nil,
       file = (track.file and track.file or ""),
       Id = track.Id or nil
     }
@@ -283,11 +280,7 @@ function makeChoicesFromAlbums(albums)
     return {
       text = album.Album,
       subText = album.Artist,
-      -- image = hs.image.iconForFile((track.file and "~/Music/"..track.file) or ""),
-      -- file = (track.file and track.file or ""),
-      -- Id = track.Id or nil
       album = album.Album,
-
     }
   end)
 end
@@ -315,6 +308,9 @@ hs.hotkey.bind(hyper, "p", function() searchChooser:show() end)
 albumChooser=hs.chooser.new(function(choice) mpd.findadd(choice.album, "album") end):width(30):searchSubText(true)
 hs.hotkey.bind(hyper, "a", function() albumChooser:show() end)
 
+playlistChooser=hs.chooser.new(playChoice):width(30):searchSubText(true)
+hs.hotkey.bind(hyper, "l", function() mpd.playlistinfo(); playlistChooser:show() end)
+
 -- menubars
 mpdMenuNext = hs.menubar.new():setIcon(icons.next):setClickCallback(function()
     mpd.next()
@@ -329,41 +325,33 @@ mpdMenuPrev = hs.menubar.new():setIcon(icons.prev):setClickCallback(function()
     mpd.updateStatus()
   end)
 
-mpdMenu = hs.menubar.new():setTitle("🎵"):setMenu({
-  { title = "Music Player Daemon", fn = function() print("you clicked my menu item!") end },
-  { title = "-" },
-  { title = "play", fn = mpd.play },
-  { title = "shuffle", fn = mpd.shuffle },
-  { title = "stop", fn = mpd.stop },
-  { title = "clear", fn = mpd.clear },
-  { title = "-" },
-  { title = "SomaFM" },
-  { title = "beatblender", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/beatblender-128-mp3") end },
-  { title = "bootliquor", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/bootliquor-128-mp3") end },
-  { title = "brfm", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/brfm-128-mp3") end },
-  { title = "cliqhop", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/cliqhop-128-mp3") end },
-  { title = "covers", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/covers-128-mp3") end },
-  { title = "digitalis", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/digitalis-128-mp3") end },
-  { title = "doomed", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/doomed-128-mp3") end },
-  { title = "dronezone", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/dronezone-128-mp3") end },
-  { title = "dubstep", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/dubstep-128-mp3") end },
-  { title = "groovesalad", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/groovesalad-128-mp3") end },
-  { title = "illstreet", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/illstreet-128-mp3") end },
-  { title = "indiepop", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/indiepop-128-mp3") end },
-  { title = "lush", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/lush-128-mp3") end },
-  { title = "missioncontrol", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/missioncontrol-128-mp3") end },
-  { title = "poptron", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/poptron-128-mp3") end },
-  { title = "secretagent", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/secretagent-128-mp3") end },
-  { title = "sf1033", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/sf1033-128-mp3") end },
-  { title = "sonicuniverse", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/sonicuniverse-128-mp3") end },
-  { title = "spacestation", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/spacestation-128-mp3") end },
-  { title = "suburbsofgoa", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/suburbsofgoa-128-mp3") end },
-  { title = "thetrip", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/thetrip-128-mp3") end },
-  { title = "u80s", indent = 1, fn = function() mpd.addplayid("http://ice1.somafm.com/u80s-128-mp3") end },
-})
+mpdMenu = hs.menubar.new():setTitle("🎵"):setMenu(hs.fnutils.concat({
+    { title = "Music Player Daemon", fn = function() print(mpd.version) end },
+    { title = "-" },
+    { title = "play", fn = mpd.play },
+    { title = "shuffle", fn = mpd.shuffle },
+    { title = "stop", fn = mpd.stop },
+    { title = "clear", fn = mpd.clear },
+    { title = "-" },
+    { title = "SomaFM", fn = function() mpd.sendrecv("load soma") end },
+  }, hs.fnutils.imap({
+    "beatblender","bootliquor","brfm","cliqhop","covers",
+    "digitalis","doomed","dronezone","dubstep","groovesalad","illstreet",
+    "indiepop","lush","missioncontrol","poptron","secretagent","sf1033",
+    "sonicuniverse","spacestation","suburbsofgoa","thetrip","u80s"
+  }, function(somaStation) return {
+      title = somaStation,
+      indent = 1,
+      fn = function() mpd.playitemonplaylist(somaStation.."-128-mp3", "file") end 
+  } end)))
 
-hs.timer.doAfter(1, mpd.updateStatus)
-hs.timer.doAfter(2, mpd.listalbumartist)
+-- start everything up
+mpd.listalbumartist()
+
+mpdStarter = hs.timer.doAfter(1, function()
+  mpd.playlistinfo()
+  mpd.updateStatus()
+end)
 
 statusTimer = hs.timer.doEvery(10, mpd.updateStatus)
 

@@ -12,8 +12,9 @@ require "window"
 require "amphetamine"
 require "imgur"
 require "pasteboard"
-require "redshift"
-mpd = require "mpd"
+-- require "redshift"
+mpd = require "mpd" --; mpd.setLogLevel("info")
+require "scratch"
 
 i = hs.inspect -- shortcut for inspecting tables
 clear = hs.console.clearConsole
