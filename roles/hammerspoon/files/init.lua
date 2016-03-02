@@ -3,29 +3,33 @@
 -- initial setup
 hyper = {'⌘', '⌥', '⌃'}
 hs.window.animationDuration = 0
+hs.luaSkinLog.setLogLevel("warning")
 hs.hotkey.setLogLevel("warning") --suppress excessive keybind printing in console
-hs.window.filter.setLogLevel("error") --suppress excessive keybind printing in console
-
-icons = require "asciicons"
-require "utils"
-require "window"
-require "amphetamine"
-require "imgur"
-require "pasteboard"
--- require "redshift"
-mpd = require "mpd" --; mpd.setLogLevel("info")
-require "scratch"
-
+hs.window.filter.setLogLevel("error")
 i = hs.inspect -- shortcut for inspecting tables
 clear = hs.console.clearConsole
+
+_ = require "std"
+table = _.table
+require "utils"
+require "window"
+require "imgur"
+require "pasteboard"
+require "redshift"
+icons = require "asciicons"
+amphetamine = require "amphetamine"
+volumes = require "volumes"
+if hs.socket and hs.image.imageFromMediaFile then mpd = require "mpd" end
+
 hs.hotkey.bind(hyper, "h", hs.toggleConsole) -- toggle hammerspoon console
 hs.hotkey.bind(hyper, '.', hs.hints.windowHints) -- show window hints
 hs.ipc.cliInstall()
 
 -- for playing with ASCIImage, etc
-function imagePreview(image)
+function imagePreview(image, size)
+  size = size or 100
   local pos = hs.mouse.getAbsolutePosition()
-  local imageRect = hs.drawing.image(hs.geometry(pos, {w = 100, h = 100}), image):show()
+  local imageRect = hs.drawing.image(hs.geometry(pos, {w = size, h = size}), image):show()
   imageRectTimer = hs.timer.doAfter(3, function() imageRect:delete() end)
 end
 

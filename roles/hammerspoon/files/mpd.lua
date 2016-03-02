@@ -52,7 +52,7 @@ tableMerge(mpd, {
   start = function() hs.execute("mpd", true) end,
 
   connect = function()
-    if not mpd.started() then mpd.start() end
+    if MPD_AUTOSTART and not mpd.started() then mpd.start() end
     logger.i("connecting...")
     mpd.socket:setCallback(mpd.readCallback):connect(mpd.host, mpd.port)
     mpd.read(mpd.tag("CONNECT"))
@@ -270,7 +270,7 @@ function makeChoicesFromTracks(tracks)
     return {
       text = track.Title or track.Name,
       subText = (track.Artist or "")..(track.Album and " - "..track.Album or "")..(track.Name or ""),
-      image = track.file and hs.image.imageFromAudioFile("~/Music/"..track.file) or hs.image.iconForFile("~/Music/"..track.file) or nil,
+      image = track.file and hs.image.imageFromMediaFile("~/Music/"..track.file) or nil,
       file = (track.file and track.file or ""),
       Id = track.Id or nil
     }
@@ -282,7 +282,7 @@ function makeChoicesFromAlbums(albums)
     return {
       text = album.Album,
       subText = album.Artist,
-      image = hs.image.imageFromAudioFile("~/Music/"..album.AlbumArtist:gsub("Various Artists", "Compilations"):gsub("[/]", "_"):gsub("[?%.]$","_").."/"..album.Album:gsub("[:/\"]", "_"):gsub("[?%.]$","_")),
+      image = hs.image.imageFromMediaFile("~/Music/"..album.AlbumArtist:gsub("Various Artists", "Compilations"):gsub("[/]", "_"):gsub("[?%.]$","_").."/"..album.Album:gsub("[:/\"]", "_"):gsub("[?%.]$","_")),
       album = album.Album,
     }
   end)

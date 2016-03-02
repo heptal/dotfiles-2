@@ -1,3 +1,5 @@
+-- pasteboard enhancments
+
 -- make verbatim google search easier
 hs.hotkey.bind({"cmd", "shift"}, "'", function()
     local oldText = hs.pasteboard.getContents()

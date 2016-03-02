@@ -1,4 +1,4 @@
---simulate flux
+-- simulate flux
 
 hs.location.start()
 hs.timer.doAfter(1, function()
