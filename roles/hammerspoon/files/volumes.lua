@@ -29,5 +29,6 @@ local diskIcon = hs.image.imageFromPath("/System/Library/CoreServices/CoreTypes.
 
 volumes.menu = hs.menubar.new():setMenu(volMenuMaker):setIcon(diskIcon:setSize({w=16,h=16}))
 volumes.watcher = hs.fs.volume.new(volMenuMaker):start()
+volMenuMaker()
 
 return volumes

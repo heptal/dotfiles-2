@@ -7,7 +7,7 @@ mpd.setLogLevel = mpd.logger.setLogLevel
 local logger = mpd.logger
 
 local fmt = string.format
-local icon = require "asciicons"
+local icons = require "asciicons"
 
 local queue = function(t, i) table.insert(t, i) end
 local dequeue = function(t) return table.remove(t, 1) end
@@ -26,6 +26,20 @@ local function mpdMenuDisplay()
 
   if mpd.status.state == "play" and not c.Title then
     hs.timer.doAfter(0.2, mpd.updateStatus)
+  end
+end
+
+local function notifyChange(newSong)
+  if not newSong.file then logger.e("no filename!"); return end
+  local image = newSong.file:sub(1,7) ~= "http://" and hs.image.imageFromMediaFile("~/Music/"..newSong.file) or nil
+  if type(mpd.track.current) == "table" and type(newSong) == "table" and not tableCompare(newSong, mpd.track.current) then
+    local notification = hs.notify.new({
+      title = newSong.Title,
+      informativeText = newSong.Artist and newSong.Artist or newSong.Name and newSong.Name or "",
+      -- contentImage = image,
+      })
+    if image then notification:setIdImage(image) end
+    notification:send()
   end
 end
 
@@ -176,14 +190,12 @@ mpd.tagReaders = {
   STATUS = { form = "table", fn = function(data)
     mpd.status = data
     mpd.currentsong()
-    mpd.nextsong()
     end
   },
   CURRENTSONG = { form = "table", fn = function(data)
-    if type(mpd.track.current) == "table" and type(data) == "table" and not tableCompare(data, mpd.track.current) then
-      hs.notify.show(data.Title or "", "", data.Artist and data.Artist or data.Name and data.Name or "", "")
-    end
+    notifyChange(data)
     mpd.track.current = data
+    mpd.nextsong()
     end
   },
   NEXTSONG = { form = "table", fn = function(data)

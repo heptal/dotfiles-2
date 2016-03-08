@@ -8,6 +8,10 @@ function tableKeys(t)
   return keys
 end
 
+function ppairs(t)
+  for k,v in pairs(t) do print(k,v) end
+end
+
 function tableSet(t)
   local hash = {}
   local res = {}

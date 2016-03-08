@@ -3522,6 +3522,13 @@
 			<key>Text</key>
 			<string></string>
 		</dict>
+		<key>0xf702-0x280000</key>
+		<dict>
+			<key>Action</key>
+			<integer>10</integer>
+			<key>Text</key>
+			<string>B</string>
+		</dict>
 		<key>0xf702-0x320000</key>
 		<dict>
 			<key>Action</key>
@@ -3535,6 +3542,13 @@
 			<integer>2</integer>
 			<key>Text</key>
 			<string></string>
+		</dict>
+		<key>0xf703-0x280000</key>
+		<dict>
+			<key>Action</key>
+			<integer>10</integer>
+			<key>Text</key>
+			<string>F</string>
 		</dict>
 		<key>0xf703-0x320000</key>
 		<dict>
@@ -3641,18 +3655,39 @@
 	<string></string>
 	<key>NSScrollAnimationEnabled</key>
 	<false/>
+	<key>NSTableView Columns KeyBingingTable</key>
+	<array>
+		<data>
+		BAtzdHJlYW10eXBlZIHoA4QBQISEhAhOU1N0cmluZwGEhAhOU09iamVjdACF
+		hAErATCG
+		</data>
+		<string>198</string>
+		<data>
+		BAtzdHJlYW10eXBlZIHoA4QBQISEhAhOU1N0cmluZwGEhAhOU09iamVjdACF
+		hAErATGG
+		</data>
+		<string>287</string>
+	</array>
+	<key>NSTableView Hidden Columns KeyBingingTable</key>
+	<array/>
+	<key>NSTableView Sort Ordering KeyBingingTable</key>
+	<array/>
 	<key>NSWindow Frame Preferences</key>
 	<string>2086 255 924 485 1440 80 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>2251 169 1011 810 1440 80 1920 1057 </string>
+	<string>2074 297 710 586 1440 80 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
-	<string>1747 414 710 586 1440 80 1920 1057 </string>
+	<string>1829 231 710 586 1440 80 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
-	<string>597 135 710 586 0 0 1440 877 </string>
+	<string>639 230 710 586 0 0 1440 877 </string>
 	<key>NSWindow Frame iTerm Window 3</key>
-	<string>1806 219 710 586 1440 80 1920 1057 </string>
+	<string>455 127 710 586 0 0 1440 877 </string>
 	<key>NSWindow Frame iTerm Window 4</key>
-	<string>1736 213 710 586 1440 80 1920 1057 </string>
+	<string>2260 204 710 586 1440 80 1920 1057 </string>
+	<key>NSWindow Frame iTerm Window 5</key>
+	<string>1743 190 710 586 1440 80 1920 1057 </string>
+	<key>NSWindow Frame iTerm Window 6</key>
+	<string>162 91 710 586 0 0 1440 877 </string>
 	<key>New Bookmarks</key>
 	<array>
 		<dict>
@@ -4346,7 +4381,7 @@
 	<key>NoSyncTimeOfLastPromo</key>
 	<real>477569056.82785898</real>
 	<key>NoSyncTimeOfLastPromoDownload</key>
-	<real>477958291.84115201</real>
+	<real>479017127.57634997</real>
 	<key>OnlyWhenMoreTabs</key>
 	<true/>
 	<key>OpenArrangementAtStartup</key>
@@ -4382,7 +4417,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2016-02-23T22:10:15Z</date>
+	<date>2016-03-07T02:13:59Z</date>
 	<key>SavePasteHistory</key>
 	<false/>
 	<key>Show Toolbelt</key>

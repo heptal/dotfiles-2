@@ -1,5 +1,11 @@
 -- adapted from various hammerspoon configs including cmsj, asmagill, trishume, zzamboni, etc.
 
+-- load a more minimal config if running from xcode
+if hs.processInfo.bundlePath:match("/Users/michael/Library/Developer/Xcode/DerivedData/") then
+  require "xcodebuild"
+  return
+end
+
 -- initial setup
 hyper = {'⌘', '⌥', '⌃'}
 hs.window.animationDuration = 0
@@ -19,7 +25,8 @@ require "redshift"
 icons = require "asciicons"
 amphetamine = require "amphetamine"
 volumes = require "volumes"
-if hs.socket and hs.image.imageFromMediaFile then mpd = require "mpd" end
+docker = require "docker"
+mpd = require "mpd" -- ; mpd.setLogLevel'info'
 
 hs.hotkey.bind(hyper, "h", hs.toggleConsole) -- toggle hammerspoon console
 hs.hotkey.bind(hyper, '.', hs.hints.windowHints) -- show window hints
@@ -60,7 +67,7 @@ hs.fnutils.each({
 
 -- open config dir for editing
 hs.hotkey.bind(hyper, ",", function()
-    hs.execute(os.getenv("HOME").."/bin/subl "..hs.configdir)
+    hs.urlevent.openURLWithBundle("file://"..hs.configdir, "com.sublimetext.3")
   end)
 
 -- auto reload config
