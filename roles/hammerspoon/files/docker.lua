@@ -2,14 +2,14 @@
 
 local docker = {}
 local fmt = string.format
-local keys = require "std.table".keys
+local keys = std.table.keys
 local pbcopy = hs.pasteboard.setContents
-local openURL = function(addr) hs.urlevent.openURLWithBundle(addr, "com.apple.Safari") end
-local env = "$(docker-machine env default);"
-local dockerExec = function(arg) return hs.execute(env.."docker "..arg, true) end
+local openURL = function(addr) hs.urlevent.openURLWithBundle(addr, hs.urlevent.getDefaultHandler("http")) end
+local env = "PATH=/usr/local/bin/:$PATH; eval $(docker-machine env default);"
+local dockerExec = function(arg) return hs.execute(env.."docker "..arg) end
 
 dockerMenuMaker = function()
-  local ipDocker, status = hs.execute(env.."docker-machine ip", true)
+  local ipDocker, status = hs.execute(env.."docker-machine ip")
   if not status then docker.menu:delete(); return end
 
   ipDocker = ipDocker:gsub("%s+", "")

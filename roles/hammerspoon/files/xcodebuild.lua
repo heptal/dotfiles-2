@@ -4,7 +4,8 @@ hs.window.animationDuration = 0
 i = hs.inspect -- shortcut for inspecting tables
 clear = hs.console.clearConsole
 
-_ = require "std"
+std = require "hs.stdlib"
+table = std.table
 require "utils"
 require "window"
 require "imgur"

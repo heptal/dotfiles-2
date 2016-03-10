@@ -1,5 +1,8 @@
 -- adapted from various hammerspoon configs including cmsj, asmagill, trishume, zzamboni, etc.
 
+hs.shutdownCallback = function()  hs.settings.set('history', hs.console.getHistory()) end
+hs.console.setHistory(hs.settings.get('history'))
+
 -- load a more minimal config if running from xcode
 if hs.processInfo.bundlePath:match("/Users/michael/Library/Developer/Xcode/DerivedData/") then
   require "xcodebuild"
@@ -15,18 +18,18 @@ hs.window.filter.setLogLevel("error")
 i = hs.inspect -- shortcut for inspecting tables
 clear = hs.console.clearConsole
 
-_ = require "std"
-table = _.table
+std = require "hs.stdlib"
+table = std.table
 require "utils"
 require "window"
 require "imgur"
 require "pasteboard"
-require "redshift"
 icons = require "asciicons"
 amphetamine = require "amphetamine"
 volumes = require "volumes"
 docker = require "docker"
 mpd = require "mpd" -- ; mpd.setLogLevel'info'
+require "redshift"
 
 hs.hotkey.bind(hyper, "h", hs.toggleConsole) -- toggle hammerspoon console
 hs.hotkey.bind(hyper, '.', hs.hints.windowHints) -- show window hints

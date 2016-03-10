@@ -2,7 +2,7 @@
 
 local volumes = {}
 local fmt = string.format
-local keys = require "std.table".keys
+local keys = std.table.keys
 
 local humanSize = function(bytes)
   local units = {'bytes', 'kb', 'MB', 'GB', 'TB', 'PB'}
