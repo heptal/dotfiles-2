@@ -1,16 +1,14 @@
--- Return the sorted keys of a table
-function tableKeys(t)
+-- global utility functions 
+
+function tableKeys(t, sorted)
   local keys={}
   for k, v in pairs(t) do
     table.insert(keys, k)
   end
-  table.sort(keys)
   return keys
 end
 
-function ppairs(t)
-  for k,v in pairs(t) do print(k,v) end
-end
+keys = hs.stdlib and hs.stdlib.table.keys or tableKeys
 
 function tableSet(t)
   local hash = {}
@@ -53,5 +51,11 @@ function tableCompare(t1, t2)
   end
   return true
 end
+
+function queue(t, i) return table.insert(t, i) end
+
+function dequeue(t) return table.remove(t, 1) end
+
+function ppairs(t) for k,v in pairs(t) do print(k,v) end end
 
 function hex(num) return string.format("%x", num) end

@@ -1,17 +1,13 @@
 -- caffeine replacement
 
-local amphetamine = {}
-local icon = require "asciicons"
-
-amphetamine.menu = hs.menubar.new()
+local module = {}
 
 local function setIcon(state)
-  amphetamine.menu:setIcon(state and icon.ampOn or icon.ampOff)
+  module.menu:setIcon(state and icons.ampOn or icons.ampOff)
 end
 
-if amphetamine.menu then
-  amphetamine.menu:setClickCallback(function() setIcon(hs.caffeinate.toggle("displayIdle")) end)
-  setIcon(hs.caffeinate.get("displayIdle"))
-end
+module.menu = hs.menubar.new()
+module.menu:setClickCallback(function() setIcon(hs.caffeinate.toggle("displayIdle")) end)
+setIcon(hs.caffeinate.get("displayIdle"))
 
-return amphetamine
+return module

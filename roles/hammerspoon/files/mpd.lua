@@ -6,12 +6,6 @@ mpd.logger = hs.logger.new("mpd")
 mpd.setLogLevel = mpd.logger.setLogLevel
 local logger = mpd.logger
 
-local fmt = string.format
-local icons = require "asciicons"
-
-local queue = function(t, i) table.insert(t, i) end
-local dequeue = function(t) return table.remove(t, 1) end
-
 local FIRSTLINE = 0
 local DEBUG = -2
 
@@ -20,11 +14,11 @@ local function mpdMenuDisplay()
   local c = mpd.track.current
   local n = mpd.track.next
 
-  local currentTooltip = (c.Artist and c.Artist.." - " or "")..(c.Title or "-")
+  local currentTooltip = (c and c.Artist and c.Artist.." - " or "")..(c and c.Title or "-")
   mpdMenuPlayPause:setTooltip(currentTooltip)
   mpdMenuNext:setTooltip(n and ((n.Artist and n.Title) and (n.Artist.." - "..n.Title) or n.Name and n.Name) or "END")
 
-  if mpd.status.state == "play" and not c.Title then
+  if mpd.status.state == "play" and not (c and c.Title) then
     hs.timer.doAfter(0.2, mpd.updateStatus)
   end
 end
@@ -222,7 +216,7 @@ mpd.tagReaders = {
   },
 }
 
-mpd.tags = tableKeys(mpd.tagReaders)
+mpd.tags = keys(mpd.tagReaders)
 mpd.tag = function(tag) return hs.fnutils.indexOf(mpd.tags, tag) end
 local tag = mpd.tag
 
@@ -344,6 +338,7 @@ mpdMenu = hs.menubar.new():setTitle("🎵"):setMenu(hs.fnutils.concat({
     { title = "Music Player Daemon", fn = function() print(mpd.version) end },
     { title = "-" },
     { title = "play", fn = mpd.play },
+    { title = "pause", fn = mpd.pause },
     { title = "shuffle", fn = mpd.shuffle },
     { title = "stop", fn = mpd.stop },
     { title = "clear", fn = mpd.clear },

@@ -1,8 +1,6 @@
 -- manage removable volumes
 
-local volumes = {}
-local fmt = string.format
-local keys = std.table.keys
+local module = {}
 
 local humanSize = function(bytes)
   local units = {'bytes', 'kb', 'MB', 'GB', 'TB', 'PB'}
@@ -13,7 +11,7 @@ end
 local volMenuMaker = function(eventType, info)
   local entries = {{title = "Disk Utility", fn = function() hs.application.launchOrFocus("Disk Utility") end}, {title = "-"}}
   local removableVolumes = hs.fnutils.filter(hs.fs.volume.allVolumes(), function(v) return v.NSURLVolumeIsRemovableKey end)
-  if #keys(removableVolumes) > 0 then volumes.menu:returnToMenuBar() else volumes.menu:removeFromMenuBar() return end
+  if #keys(removableVolumes) > 0 then module.menu:returnToMenuBar() else module.menu:removeFromMenuBar() return end
 
   hs.fnutils.each(keys(removableVolumes), function(path)
       local name = path:match("^/Volumes/(.*)")
@@ -26,9 +24,8 @@ local volMenuMaker = function(eventType, info)
 end
 
 local diskIcon = hs.image.imageFromPath("/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarRemovableDisk.icns")
-
-volumes.menu = hs.menubar.new():setMenu(volMenuMaker):setIcon(diskIcon:setSize({w=16,h=16}))
-volumes.watcher = hs.fs.volume.new(volMenuMaker):start()
+module.menu = hs.menubar.new():setMenu(volMenuMaker):setIcon(diskIcon:setSize({w=16,h=16}))
+module.watcher = hs.fs.volume.new(volMenuMaker):start()
 volMenuMaker()
 
-return volumes
+return module
