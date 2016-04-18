@@ -1,13 +1,38 @@
-
-# A number of utilities that don't get installed by any of the other
-# roles
+# A number of utilities that don't get installed by any of the other roles
 osx_homebrew_packages:
   - wget
   - tree
+  - z
+  - gnu-sed
+  - nmap
+  - mergepbx
+  - socat
+  - tmux
+  # Media
+  # - ffmpeg --with-rtmpdump --with-ffplay
+  - gifsicle
+  - imagemagick  - mpv
+  - mpd
+  - rtmpdump
+  - sox
+  - youtube-dl
 
 # Mac Apps to be installed with homebrew-cask
 osx_cask_packages:
-  # - firefox
-  # - google-chrome
-  # - bettertouchtool
-  # - iterm2
+  # QuickLook
+  - betterzipql
+  - qlcolorcode
+  - qlimagesize
+  - qlmarkdown
+  - qlprettypatch
+  - qlstephen
+  - quicklook-csv
+  - quicklook-json
+  - suspicious-package
+  - voxql
+  - webpquicklook
+  # Programs
+  - hex-fiend
+  - limechat
+  - karabiner
+  - dockertoolbox

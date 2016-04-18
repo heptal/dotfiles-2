@@ -3,3 +3,5 @@
   when: ansible_os_family == "Darwin"
 
 # TODO: Fedora and Debian
+
+# [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*

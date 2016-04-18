@@ -1,5 +1,0 @@
-npm_global_packages:
-  - grunt-cli
-  - gulp
-  - coffee-script
-  - jshint
