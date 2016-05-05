@@ -8,13 +8,13 @@ dotfiles_user_home: "{{ '~' | expanduser }}"
 dotfiles_home: "{{dotfiles_user_home}}/dotfiles"
 
 # Name used in commit messages
-full_name: First Last
+full_name: Stephen Cassidy
 # Git
 # Github username
-git_user: username
+git_user: stevemartingale
 # If you use github, this should be the same as the email
 #  used on Github
-git_email: user@example.com
+git_email: stephen.cassidy@gmail.com
 
 # Vim
 
@@ -46,17 +46,24 @@ osx_cask_packages:
   - suspicious-package
   # Browsers
   - firefox
-  - google-chrome
+  #- google-chrome
   # Utilities
   - bettertouchtool
   - iterm2
   # Vagrant/Virtualbox
   - vagrant
+  - vagrant-manager
   - virtualbox
   # chat
-  - limechat
+  #- limechat
   # Backup/storage
-  # - crashplan
+  - crashplan
+  - transmission
+  - alfred
+  - divvy
+  - vlc
+  - caffeine
+  - sublime-text3
 
 # Node utilities
 npm_global_packages:
