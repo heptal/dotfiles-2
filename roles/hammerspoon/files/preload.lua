@@ -14,6 +14,8 @@ fw = hs.window.focusedWindow
 fmt = string.format
 bind = hs.hotkey.bind
 clear = hs.console.clearConsole
+reload = hs.reload
+pbcopy = hs.pasteboard.setContents
 std = hs.stdlib and require("hs.stdlib")
 
 -- useful keybindings
