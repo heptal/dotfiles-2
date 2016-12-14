@@ -3674,28 +3674,43 @@
 		BAtzdHJlYW10eXBlZIHoA4QBQISEhAhOU1N0cmluZwGEhAhOU09iamVjdACF
 		hAErATGG
 		</data>
-		<string>307</string>
+		<string>322</string>
 	</array>
 	<key>NSTableView Hidden Columns KeyBingingTable</key>
 	<array/>
 	<key>NSTableView Sort Ordering KeyBingingTable</key>
 	<array/>
+	<key>NSToolbar Configuration com.apple.NSColorPanel</key>
+	<dict>
+		<key>TB Is Shown</key>
+		<integer>1</integer>
+	</dict>
 	<key>NSWindow Frame Preferences</key>
-	<string>88 218 606 456 0 0 1440 877 </string>
+	<string>88 412 606 456 0 0 1440 877 </string>
+	<key>NSWindow Frame SUUpdateAlert</key>
+	<string>432 363 620 392 0 0 1440 877 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>2285 155 710 587 1440 80 1920 1057 </string>
+	<string>2555 199 710 587 1440 80 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
-	<string>1566 299 710 587 1440 80 1920 1057 </string>
+	<string>2442 93 843 587 1440 80 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 2</key>
-	<string>1574 332 710 587 1440 80 1920 1057 </string>
+	<string>2038 213 710 587 1440 80 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 3</key>
-	<string>1986 108 710 586 1440 80 1920 1057 </string>
+	<string>1622 281 710 587 1440 80 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 4</key>
-	<string>2381 81 710 586 1440 80 1920 1057 </string>
+	<string>1913 140 710 587 1440 80 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 5</key>
-	<string>1743 190 710 586 1440 80 1920 1057 </string>
+	<string>1767 187 710 587 1440 80 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 6</key>
-	<string>1709 227 710 586 1440 80 1920 1057 </string>
+	<string>1709 213 710 587 1440 80 1920 1057 </string>
+	<key>NSWindow Frame iTerm Window 7</key>
+	<string>1642 259 710 587 1440 80 1920 1057 </string>
+	<key>NSWindow Frame iTerm Window 8</key>
+	<string>1834 550 710 587 1440 80 1920 1057 </string>
+	<key>NeverWarnAboutShortLivedSessions_12D6BDDF-FE89-45E9-846E-BA91204D2753</key>
+	<true/>
+	<key>NeverWarnAboutShortLivedSessions_12D6BDDF-FE89-45E9-846E-BA91204D2753_selection</key>
+	<integer>0</integer>
 	<key>New Bookmarks</key>
 	<array>
 		<dict>
@@ -4427,8 +4442,14 @@
 	<true/>
 	<key>NoSyncDoNotWarnBeforeMultilinePaste_selection</key>
 	<integer>0</integer>
+	<key>NoSyncDoNotWarnBeforePastingOneLineEndingInNewlineAtShellPrompt</key>
+	<true/>
+	<key>NoSyncDoNotWarnBeforePastingOneLineEndingInNewlineAtShellPrompt_selection</key>
+	<integer>1</integer>
 	<key>NoSyncHaveShownPromoWithId_4</key>
 	<true/>
+	<key>NoSyncPermissionToShowTip</key>
+	<false/>
 	<key>NoSyncTimeOfFirstLaunchOfVersionWithTip</key>
 	<real>479343558.62925899</real>
 	<key>NoSyncTimeOfLastPromo</key>
@@ -4472,7 +4493,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2016-03-12T23:43:09Z</date>
+	<date>2016-04-18T17:45:05Z</date>
 	<key>SavePasteHistory</key>
 	<false/>
 	<key>Show Toolbelt</key>
@@ -4528,6 +4549,6 @@
 	<key>findRegex_iTerm</key>
 	<false/>
 	<key>iTerm Version</key>
-	<string>2.9.20160206</string>
+	<string>2.9.20160313</string>
 </dict>
 </plist>
